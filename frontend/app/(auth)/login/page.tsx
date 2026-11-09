@@ -26,7 +26,8 @@ export default function LoginPage() {
 
       if (response.ok) {
         const data = await response.json()
-        document.cookie = `access_token=${data.access_token}; path=/`
+        document.cookie = `access_token=${data.access_token}; path=/; max-age=${60 * 60 * 24}`
+        document.cookie = `refresh_token=${data.refresh_token}; path=/; max-age=${60 * 60 * 24 * 30}`
         router.push('/dashboard')
       } else {
         setError('Invalid email or password')

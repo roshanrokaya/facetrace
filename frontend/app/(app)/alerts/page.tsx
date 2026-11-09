@@ -253,9 +253,11 @@ export default function AlertsPage() {
   }
 
   const acknowledgeAlert = async (id: number) => {
+    console.log('[Alerts] Acknowledging alert:', id)
     setAcknowledging(id)
     try {
       const token = getToken()
+      console.log('[Alerts] Token:', token ? 'present' : 'MISSING')
       const response = await fetch(`${API_URL}/api/v1/alerts/${id}`, {
         method: 'PATCH',
         headers: {
@@ -265,6 +267,7 @@ export default function AlertsPage() {
         body: JSON.stringify({ status: 'acknowledged' }),
       })
 
+      console.log('[Alerts] PATCH response:', response.status, response.statusText)
       if (response.ok) {
         setAlerts((prev) =>
           prev.map((a) => (a.id === id ? { ...a, status: 'acknowledged' } : a))
@@ -272,6 +275,9 @@ export default function AlertsPage() {
         if (selectedAlert?.id === id) {
           setSelectedAlert((prev) => prev ? { ...prev, status: 'acknowledged' } : null)
         }
+      } else {
+        const errorBody = await response.text()
+        console.error('[Alerts] PATCH failed:', response.status, errorBody)
       }
     } catch (err) {
       console.error('Failed to acknowledge alert:', err)
